@@ -21,3 +21,18 @@ export const constructApiUrl = (baseUrl: string, filters: Filters): string => {
   const queryString = params.toString()
   return queryString ? `${baseUrl}?${queryString}` : baseUrl
 }
+
+export const debounce = <T extends (...args: any[]) => void>(
+  functionToBeDebounced: T,
+  delay: number
+): ((...args: Parameters<T>) => void) => {
+  let timeoutId: ReturnType<typeof setTimeout> | null = null
+  return (...args: Parameters<T>): void => {
+    if (timeoutId) {
+      clearTimeout(timeoutId)
+    }
+    timeoutId = setTimeout(() => {
+      functionToBeDebounced(...args)
+    }, delay)
+  }
+}
