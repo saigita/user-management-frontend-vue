@@ -35,14 +35,10 @@ describe('SearchComponent', () => {
     expect(wrapper.emitted('update:searchQuery')?.[0]).toEqual(['new search'])
   })
 
-  it('sets the input value from searchQuery prop', () => {
-    const wrapperWithProps = mount(SearchComponent, {
-      props: {
-        searchQuery: 'test query'
-      }
-    })
+  it('sets the input value from searchQuery prop', async () => {
+    await wrapper.setProps({ searchQuery: 'test query' })
 
-    const input = wrapperWithProps.find('input[type="search"]')
+    const input = wrapper.find('input[type="search"]')
     expect((input.element as HTMLInputElement).value).toBe('test query')
   })
 })
