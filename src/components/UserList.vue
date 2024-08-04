@@ -13,8 +13,6 @@
   const { fetchUsers } = userStore
 
   onMounted(fetchUsers)
-
-  console.log('usersTableData', usersTableData)
 </script>
 
 <template>
