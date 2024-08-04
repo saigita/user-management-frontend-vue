@@ -23,7 +23,7 @@ describe('useUserStore', () => {
     expect(store.users).toEqual([])
     expect(store.filteredUsers).toEqual([])
     expect(store.loading).toBe(false)
-    expect(store.error).toBe(null)
+    expect(store.error).toBeNull()
     expect(store.filters).toEqual({
       seed: API_SEED,
       include: INCLUDE_FILTER,
@@ -33,96 +33,102 @@ describe('useUserStore', () => {
     expect(store.searchQuery).toBeUndefined()
   })
 
-  it('fetchUsers updates store correctly on success', async () => {
-    const mockUsers = [
-      {
-        name: { first: 'John', last: 'Doe' },
-        email: 'john@example.com',
-        location: { city: 'New York', country: 'USA' },
-        login: { uuid: '123' },
-        registered: { date: '2023-01-01' }
-      },
-      {
-        name: { first: 'Jane', last: 'Doe' },
-        email: 'jane@example.com',
-        location: { city: 'London', country: 'UK' },
-        login: { uuid: '456' },
-        registered: { date: '2023-02-01' }
-      }
-    ]
-    vi.mocked(userService.fetchUsers).mockResolvedValue(mockUsers)
+  describe('fetchUsers', () => {
+    it('fetches users successfully', async () => {
+      const mockUsers = [
+        {
+          name: { first: 'John', last: 'Doe' },
+          email: 'john@example.com',
+          location: { city: 'New York', country: 'USA' },
+          login: { uuid: '123' },
+          registered: { date: '2023-01-01' }
+        },
+        {
+          name: { first: 'Jane', last: 'Doe' },
+          email: 'jane@example.com',
+          location: { city: 'London', country: 'UK' },
+          login: { uuid: '456' },
+          registered: { date: '2023-02-01' }
+        }
+      ]
+      vi.mocked(userService.fetchUsers).mockResolvedValue(mockUsers)
 
-    const store = useUserStore()
-    await store.fetchUsers()
+      const store = useUserStore()
+      await store.fetchUsers()
 
-    expect(store.users).toEqual(mockUsers)
-    expect(store.filteredUsers).toEqual(mockUsers)
-    expect(store.loading).toBe(false)
-    expect(store.error).toBe(null)
-    expect(store.filters.page).toBe(2)
+      expect(store.users).toEqual(mockUsers)
+      expect(store.filteredUsers).toEqual(mockUsers)
+      expect(store.loading).toBe(false)
+      expect(store.error).toBeNull()
+      expect(store.filters.page).toBe(2)
+    })
+
+    it('handles errors correctly', async () => {
+      const errorMessage = 'Network error'
+      vi.mocked(userService.fetchUsers).mockRejectedValue(new Error(errorMessage))
+
+      const store = useUserStore()
+      await store.fetchUsers()
+
+      expect(store.loading).toBe(false)
+      expect(store.error).toBe(errorMessage)
+    })
   })
 
-  it('fetchUsers handles errors correctly', async () => {
-    const errorMessage = 'Network error'
-    vi.mocked(userService.fetchUsers).mockRejectedValue(new Error(errorMessage))
+  describe('filterUsers', () => {
+    it('filters users correctly', () => {
+      const store = useUserStore()
+      store.users = [
+        {
+          name: { first: 'John', last: 'Doe' },
+          email: 'john@example.com',
+          location: { city: 'New York', country: 'USA' },
+          login: { uuid: '123' },
+          registered: { date: '2023-01-01' }
+        },
+        {
+          name: { first: 'Jane', last: 'Doe' },
+          email: 'jane@example.com',
+          location: { city: 'London', country: 'UK' },
+          login: { uuid: '456' },
+          registered: { date: '2023-02-01' }
+        }
+      ]
 
-    const store = useUserStore()
-    await store.fetchUsers()
+      store.filterUsers('john')
+      expect(store.filteredUsers).toHaveLength(1)
+      expect(store.filteredUsers[0].name.first).toBe('John')
 
-    expect(store.loading).toBe(false)
-    expect(store.error).toBe(errorMessage)
+      store.filterUsers('doe')
+      expect(store.filteredUsers).toHaveLength(2)
+
+      store.filterUsers('nonexistent')
+      expect(store.filteredUsers).toHaveLength(0)
+    })
   })
 
-  it('filterUsers filters users correctly', () => {
-    const store = useUserStore()
-    store.users = [
-      {
-        name: { first: 'John', last: 'Doe' },
+  describe('getUserTableData', () => {
+    it('formats user data correctly', () => {
+      const store = useUserStore()
+      store.filteredUsers = [
+        {
+          name: { first: 'John', last: 'Doe' },
+          email: 'john@example.com',
+          location: { city: 'New York', country: 'USA' },
+          login: { uuid: '123' },
+          registered: { date: '2023-01-01' }
+        }
+      ]
+
+      const tableData = store.getUserTableData
+      expect(tableData).toHaveLength(1)
+      expect(tableData[0]).toEqual({
+        id: '123',
+        name: 'John Doe',
         email: 'john@example.com',
-        location: { city: 'New York', country: 'USA' },
-        login: { uuid: '123' },
-        registered: { date: '2023-01-01' }
-      },
-      {
-        name: { first: 'Jane', last: 'Doe' },
-        email: 'jane@example.com',
-        location: { city: 'London', country: 'UK' },
-        login: { uuid: '456' },
-        registered: { date: '2023-02-01' }
-      }
-    ]
-
-    store.filterUsers('john')
-    expect(store.filteredUsers).toHaveLength(1)
-    expect(store.filteredUsers[0].name.first).toBe('John')
-
-    store.filterUsers('doe')
-    expect(store.filteredUsers).toHaveLength(2)
-
-    store.filterUsers('nonexistent')
-    expect(store.filteredUsers).toHaveLength(0)
-  })
-
-  it('usersTableData computes correctly', () => {
-    const store = useUserStore()
-    store.filteredUsers = [
-      {
-        name: { first: 'John', last: 'Doe' },
-        email: 'john@example.com',
-        location: { city: 'New York', country: 'USA' },
-        login: { uuid: '123' },
-        registered: { date: '2023-01-01' }
-      }
-    ]
-
-    const tableData = store.usersTableData
-    expect(tableData).toHaveLength(1)
-    expect(tableData[0]).toEqual({
-      id: '123',
-      name: 'John Doe',
-      email: 'john@example.com',
-      location: 'New York, USA',
-      registered_date: new Date('2023-01-01').toDateString()
+        location: 'New York, USA',
+        registered_date: new Date('2023-01-01').toDateString()
+      })
     })
   })
 })

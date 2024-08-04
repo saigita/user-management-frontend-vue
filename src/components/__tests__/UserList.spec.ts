@@ -1,7 +1,7 @@
-import { nextTick, ref } from 'vue'
+import { nextTick } from 'vue'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
-import { createPinia, setActivePinia } from 'pinia'
+import { createTestingPinia } from '@pinia/testing'
 
 import { useUserStore } from '@/stores/user'
 import { USER_COLUMNS } from '@/constants/userList'
@@ -11,25 +11,21 @@ import Table from '@/components/common/Table.vue'
 
 import UserList from '../UserList.vue'
 
-vi.mock('@/stores/user', () => ({
-  useUserStore: vi.fn()
-}))
-
 describe('UserList', () => {
   let wrapper: any
-  let mockStore: any
+  let userStore: any
 
   beforeEach(() => {
-    setActivePinia(createPinia())
-    mockStore = {
-      loading: ref(false),
-      error: ref(null),
-      searchQuery: ref(''),
-      usersTableData: ref([]),
-      fetchUsers: vi.fn()
-    }
-    vi.mocked(useUserStore).mockReturnValue(mockStore)
-    wrapper = mount(UserList)
+    wrapper = mount(UserList, {
+      global: {
+        plugins: [
+          createTestingPinia({
+            createSpy: vi.fn
+          })
+        ]
+      }
+    })
+    userStore = useUserStore()
   })
 
   it('renders the component', () => {
@@ -47,24 +43,33 @@ describe('UserList', () => {
     expect(table.props('columns')).toBe(USER_COLUMNS)
     expect(table.props('data')).toStrictEqual([])
     expect(table.props('loading')).toBe(false)
-    expect(table.props('fetchData')).toBe(mockStore.fetchUsers)
+    expect(table.props('fetchData')).toBe(userStore.fetchUsers)
   })
 
   it('calls fetchUsers on mount', () => {
-    expect(mockStore.fetchUsers).toHaveBeenCalledOnce()
+    expect(userStore.fetchUsers).toHaveBeenCalledOnce()
   })
 
   it('displays error message when error exists', async () => {
-    mockStore.error.value = 'Error fetching users'
+    userStore.error = 'Error fetching users'
     await nextTick()
     const errorMessage = wrapper.find('[data-testid="error-message"]')
     expect(errorMessage.exists()).toBe(true)
     expect(errorMessage.text()).toBe('Error fetching users')
   })
 
-  it('updates searchQuery when Search component emits update', async () => {
-    const search = wrapper.findComponent(Search)
-    await search.vm.$emit('update:searchQuery', 'John')
-    expect(mockStore.searchQuery.value).toBe('John')
+  it('debounces filterUsers call when searchQuery changes', async () => {
+    vi.useFakeTimers()
+    const searchQuery = 'test'
+
+    userStore.searchQuery = searchQuery
+    await nextTick()
+
+    expect(userStore.filterUsers).not.toHaveBeenCalled()
+
+    vi.advanceTimersByTime(300)
+
+    expect(userStore.filterUsers).toHaveBeenCalledTimes(1)
+    expect(userStore.filterUsers).toHaveBeenCalledWith(searchQuery)
   })
 })
