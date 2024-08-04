@@ -6,3 +6,5 @@ export const USER_COLUMNS: Column[] = [
   { key: 'location', label: 'Location' },
   { key: 'registered_date', label: 'Registered Date' }
 ]
+
+export const INCLUDE_FILTER = ['name', 'email', 'location', 'registered', 'login']
