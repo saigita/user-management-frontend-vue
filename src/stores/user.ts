@@ -5,7 +5,7 @@ import type { Ref, ComputedRef } from 'vue'
 import { API_SEED } from '@/constants/common'
 import type { Filters, User } from '@/interfaces/userList'
 import { debounce } from '@/utilities/common'
-import { userService } from '@/services/user'
+import userService from '@/services/user'
 import { INCLUDE_FILTER } from '@/constants/userList'
 
 interface UserTableData {

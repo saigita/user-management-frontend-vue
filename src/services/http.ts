@@ -1,4 +1,4 @@
-export class HttpService {
+class HttpService {
   private baseUrl: string
 
   constructor(baseUrl: string) {
@@ -41,4 +41,4 @@ export class HttpService {
   }
 }
 
-export const httpService = new HttpService(import.meta.env.VITE_API_BASE_URL)
+export default HttpService

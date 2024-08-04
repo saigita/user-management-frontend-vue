@@ -1,14 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
 
-import { userService } from '@/services/user'
+import userService from '@/services/user'
 import { API_SEED } from '@/constants/common'
 import { INCLUDE_FILTER } from '@/constants/userList'
 
 import { useUserStore } from './user'
 
 vi.mock('@/services/user', () => ({
-  userService: {
+  default: {
     fetchUsers: vi.fn()
   }
 }))
