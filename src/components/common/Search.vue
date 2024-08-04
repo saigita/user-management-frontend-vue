@@ -39,7 +39,7 @@
         :value="searchQuery"
         @input="handleSearch"
         type="search"
-        placeholder="Search Mockups, Logos..."
+        placeholder="Search with name or email"
         class="bg-zinc-800 border-none border-0 text-sm text-white rounded-lg block w-full p-3 ps-10 input-box"
       />
     </div>
