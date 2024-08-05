@@ -10,17 +10,23 @@ interface Name {
   last: string
 }
 
+interface LoginData {
+  uuid: string
+}
+
+interface Location {
+  city: string
+  country: string
+}
+
+interface Registered {
+  date: string
+}
+
 export interface User {
   name: Name
   email: string
-  login: {
-    uuid: string
-  }
-  location: {
-    city: string
-    country: string
-  }
-  registered: {
-    date: string
-  }
+  login: LoginData
+  location: Location
+  registered: Registered
 }
