@@ -1,4 +1,4 @@
-# user-management-frontend-vue
+# Handling large data set with Vue 3
 
 A web application built with Vue 3 that displays and manages a large dataset
 
