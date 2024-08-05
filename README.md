@@ -28,15 +28,15 @@ yarn test:unit-coverage
 
 ## Deployed Version
 
-The application is deployed on Vercel and can be accessed [here](https://user-management-frontend-vue.vercel.app/)
+This application is deployed on Vercel and can be accessed [here](https://user-management-frontend-vue.vercel.app/)
 
 ## About the project
 
-### Choice between Vue 2 and Vue 3
+### Why was Vue 3 chosen over Vue 2?
 
-- Coming from a React background, the organization of component logic in Vue 3 with Composition API felt closer to use of functional components and hooks in React.
+- Coming from a React background, the organization of component logic in Vue 3 with Composition API felt closer to the usage of functional components and hooks in React.
 - Better typescript support
-- Why not start with the latest especially when you are new to the framework.
+- Why not start with the latest, especially when you are new to the framework.
 
 ### Architectural decisions
 
