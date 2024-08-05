@@ -34,7 +34,7 @@ describe('Table Component', () => {
     expect(wrapper.find('tbody').exists()).toBe(true)
   })
 
-  it('renders correct number of columns', () => {
+  it('renders correct number of columns with proper labels', () => {
     const headers = wrapper.findAll('th')
     expect(headers).toHaveLength(mockColumns.length)
     headers.forEach((header, index) => {
@@ -63,27 +63,27 @@ describe('Table Component', () => {
     expect(wrapper.find('.loading-more').exists()).toBe(true)
   })
 
-  //   it('calls fetchData when scrolled to bottom', async () => {
-  //     const tableContainer = wrapper.find('.table-container').element
+  it('calls fetchData when scrolled to bottom', async () => {
+    const tableContainer = wrapper.find('.table-container').element
 
-  //     Object.defineProperty(tableContainer, 'scrollHeight', { value: 1000 })
-  //     Object.defineProperty(tableContainer, 'clientHeight', { value: 600 })
-  //     tableContainer.scrollTop = 380
+    Object.defineProperty(tableContainer, 'scrollHeight', { value: 2200 })
+    Object.defineProperty(tableContainer, 'clientHeight', { value: 600 })
+    tableContainer.scrollTop = 120
 
-  //     await wrapper.find('.table-container').trigger('scroll')
-  //     expect(mockFetchData).toHaveBeenCalled()
-  //   })
+    await wrapper.find('.table-container').trigger('scroll')
+    expect(mockFetchData).toHaveBeenCalled()
+  })
 
   it('calls fetchData when scrolled to exact threshold', async () => {
     const longData = Array.from({ length: 11 }, (_, i) => ({ id: i, name: `Name ${i}` }))
     await wrapper.setProps({ data: longData })
 
     const tableContainer = wrapper.find('.table-container').element
-    Object.defineProperty(tableContainer, 'scrollHeight', { value: 1000 })
-    Object.defineProperty(tableContainer, 'clientHeight', { value: 960 })
+    Object.defineProperty(tableContainer, 'scrollHeight', { value: 2100 })
+    Object.defineProperty(tableContainer, 'clientHeight', { value: 600 })
 
     // Set scrollTop to exactly trigger the threshold
-    tableContainer.scrollTop = 0 // 1000 - 960 - 40 = 0
+    tableContainer.scrollTop = 0
 
     await wrapper.find('.table-container').trigger('scroll')
     expect(mockFetchData).toHaveBeenCalledTimes(1)
@@ -94,29 +94,14 @@ describe('Table Component', () => {
     await wrapper.setProps({ data: longData })
 
     const tableContainer = wrapper.find('.table-container').element
-    Object.defineProperty(tableContainer, 'scrollHeight', { value: 1000 })
-    Object.defineProperty(tableContainer, 'clientHeight', { value: 959 })
+    Object.defineProperty(tableContainer, 'scrollHeight', { value: 2200 })
+    Object.defineProperty(tableContainer, 'clientHeight', { value: 600 })
 
     // Set scrollTop to just above the threshold
-    tableContainer.scrollTop = 0 // 1000 - 959 - 40 = 1
+    tableContainer.scrollTop = 50
 
     await wrapper.find('.table-container').trigger('scroll')
     expect(mockFetchData).not.toHaveBeenCalled()
-  })
-
-  it('uses different threshold for small data sets', async () => {
-    const smallData = Array.from({ length: 5 }, (_, i) => ({ id: i, name: `Name ${i}` }))
-    await wrapper.setProps({ data: smallData })
-
-    const tableContainer = wrapper.find('.table-container').element
-    Object.defineProperty(tableContainer, 'scrollHeight', { value: 1000 })
-    Object.defineProperty(tableContainer, 'clientHeight', { value: 980 })
-
-    // Set scrollTop to exactly trigger the threshold for small data sets
-    tableContainer.scrollTop = 0 // 1000 - 980 - 20 = 0
-
-    await wrapper.find('.table-container').trigger('scroll')
-    expect(mockFetchData).toHaveBeenCalledTimes(1)
   })
 
   it('handles null tableContainer', async () => {

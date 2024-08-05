@@ -23,7 +23,7 @@
     if (!tableContainer.value) return
 
     const { scrollTop, scrollHeight, clientHeight } = tableContainer.value
-    const thresholdInPixels = props.data.length > 10 ? 40 : 20
+    const thresholdInPixels = 1500
     if (scrollTop + clientHeight >= scrollHeight - thresholdInPixels) {
       loadMoreData()
     }
